@@ -1,0 +1,16 @@
+services:
+    db2:
+        image: mariadb:latest
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: laravelapi
+            MYSQL_USER: laravelapi
+            MYSQL_PASSWORD: laravelapi
+            MYSQL_DATABASE: laravelapi
+        ports:
+            - "3310:3306"
+        volumes:
+            - mariadb_data:/var/lib/mysql
+
+volumes:
+    mariadb_data:
