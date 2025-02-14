@@ -1,0 +1,9 @@
+laravel new laravelApi
+
+
+cd laravelApi
+npm install && npm run build
+--- push
+
+php artisan install:api
+
