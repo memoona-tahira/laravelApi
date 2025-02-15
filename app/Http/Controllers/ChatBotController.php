@@ -40,7 +40,6 @@ class ChatBotController extends Controller
             }
 
             $session_id = $accessToken->id;
-            $sessionId = session()->getId();
 
             return $this->handleAuthenticatedChat($request, $session_id, $user->id);
         }
