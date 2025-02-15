@@ -6,61 +6,76 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
+# ChatBot Session and Token Explanation
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project involves creating a chatbot system that allows both authenticated and guest users to chat with the bot. The bot's responses are stored, and for authenticated users, previous chat history is maintained. The system relies on tokens for user authentication and sessions to track individual chat interactions.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Key Concepts
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. **Session**
+A session is a unique identifier that tracks the user's conversation with the bot. It allows us to store the entire chat history of a user under a specific session ID.
+- Each user is assigned a session ID, which is generated when the user makes a request.
+- For authenticated users, the session ID remains the same as long as the token is valid.
+- A session is tied to the user, allowing the chatbot to retrieve and display previous messages.
 
-## Learning Laravel
+In the example provided, you can see that the `session_id` is used to group messages together.
+For example:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| user_id | session_id | user_message           | bot_response            | created_at           |
+|---------|------------|------------------------|-------------------------|----------------------|
+| 1       | 2          | whats 2 divided by 0    | 0 is not defined as a number that can be divided,...     | 2025-02-15 15:04:07  |
+| 2       | 2          | again??                | 	2 divided by 0 is undefined in standard mathem...    | 2025-02-15 15:04:37  |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+Both messages are under the same session (`session_id` = 2), showing that they are part of the same ongoing conversation.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. **Token**
+A token is used to authenticate the user. It is a string of characters sent by the user in the request header to validate their identity.
+- When a user logs in, they receive an authentication token.
+- This token is sent with every request to authenticate and verify the user.
+- If the token is invalid or expired, the user is asked to log in again to get a new token.
 
-## Laravel Sponsors
+### How Tokens and Sessions Work Together
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- When the user sends a request with a valid token, the system checks the token and retrieves the associated user.
+- If the token is valid, the system will use the same session for the user unless the token expires.
+- For each request, a new `session_id` is created for the user, and the system uses that session ID to store and retrieve the user's chat history.
 
-### Premium Partners
+If the token is changed or expired, a new session will be generated. However, as long as the token is valid and unchanged, the session will remain the same. This allows the chatbot to maintain a continuous conversation history for the user.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Example Workflow
 
-## Contributing
+1. **Authenticated User**:
+    - A user sends a message to the chatbot with their authentication token.
+    - The system validates the token and checks if the session already exists for that user.
+    - If the session exists, the system retrieves the user's previous messages and appends the new message to the conversation.
+    - The bot responds, and the entire conversation (with new messages) is stored under the same session.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+2. **Guest User**:
+    - If the user is not authenticated (no token provided), the system treats the user as a guest.
+    - A new session is generated for the guest.
+    - Only the current message is stored, and no previous chat history is maintained for guests.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Session and Token Flow Diagram
 
-## Security Vulnerabilities
+*Refer to the database table image for better understanding of how chat history is stored based on session IDs.*
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Token Validation**:
+    - The token is sent via the `Authorization` header in the request. The server validates it to ensure the request comes from an authenticated user.
 
-## License
+- **Session Handling**:
+    - The session is either created or retrieved using the token and is used to group messages together in the chat history.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Conclusion
+
+In summary, the session ID and token work together to:
+- Authenticate users.
+- Maintain continuous chat histories for each user session.
+- Ensure that the chatbot responds with context from previous messages (for authenticated users) while keeping track of new conversations.
+
+This system makes it possible to handle both authenticated and guest users while providing a consistent experience across sessions.
