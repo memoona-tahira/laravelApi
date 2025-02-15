@@ -27,7 +27,7 @@ For example:
 | user_id | session_id | user_message           | bot_response            | created_at           |
 |---------|------------|------------------------|-------------------------|----------------------|
 | 1       | 2          | whats 2 divided by 0    | 0 is not defined as a number that can be divided,...     | 2025-02-15 15:04:07  |
-| 2       | 2          | again??                | 	2 divided by 0 is undefined in standard mathem...    | 2025-02-15 15:04:37  |
+| 1       | 2          | again??                | 	2 divided by 0 is undefined in standard mathem...    | 2025-02-15 15:04:37  |
 
 Both messages are under the same session (`session_id` = 2), showing that they are part of the same ongoing conversation.
 
