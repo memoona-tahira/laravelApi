@@ -9,3 +9,10 @@ php artisan install:api
 
  php artisan make:controller AuthController
 
+ php artisan make:controller ChatbotController
+
+php artisan make:model ChatHistory -m
+
+
+ php artisan migrate
+
