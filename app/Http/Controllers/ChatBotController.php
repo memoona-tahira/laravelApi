@@ -101,8 +101,7 @@ class ChatBotController extends Controller
         ]);
 
         return response()->json([
-            'response' => $botResponse,
-            'session_id' => $sessionId
+            'response' => $botResponse
         ]);
     }
 }
